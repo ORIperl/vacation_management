@@ -1,65 +1,102 @@
 import React, { useState } from "react";
-import { Button, Typography, Box, Paper, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+import {
+  Button,
+  Typography,
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TextField,
+} from "@mui/material";
 
-// Manager dashboard component
 const ManagerDashboard: React.FC = () => {
- // const user_id = localStorage.getItem("user_id");
-  const userEmail = localStorage.getItem("userEmail") || "Manager"; // Fallback to "manager" if email not found
-  
+  const userEmail = localStorage.getItem("userEmail") || "Manager";
+
   interface VacationRequest {
-      id: number;
-      start_date: string;
-      end_date: string;
-      status: string;
+    id: number;
+    start_date: string;
+    end_date: string;
+    status: string;
+  }
+
+  interface CalendarEntry {
+    user_name: string;
+    start_date: string;
+    end_date: string;
+  }
+
+  const [vacationRequests, setVacationRequests] = useState<VacationRequest[]>([]);
+  const [showRequests, setShowRequests] = useState(false);
+  const [calendarData, setCalendarData] = useState<CalendarEntry[]>([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  // Function to handle approving or denying a request
+  const handleApproveRequest = async (requestId: number, isApproved: string) => {
+    try {
+      await fetch(`http://127.0.0.1:8000/api/manager/vacations/${requestId}/status?status=${isApproved}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+      });
+  } catch (error) {
+      console.error("Error approving request:", error);
     }
-    // State to hold fetched vacation requests
-    const [vacationRequests, setVacationRequests] = useState<VacationRequest[]>([]); // use state to hold the pending requests
-  // State to toggle display of requests
-    const [showRequests, setShowRequests] = useState(false); // use state to toggle display
-
-
-  // Functions to handle request submission and viewing
-  const handleApproveRequest = () => {
-    alert("Vacation request approved!");
-    // Add logic for request approval here
-  };
-
-  const handleDenyRequest = () => {
-    alert("Vacation request denied!");
-    // Add logic for request denial here
-  };
-
+    // After approving/denying, refresh the list
+    const res = await fetch(`http://127.0.0.1:8000/api/manager/pending_vacations`);//get updated list
+    const data = await res.json();// get json 
+    if (res.ok) setVacationRequests(data);// update state with new list
+  } 
+  // Function to fetch and toggle display of pending vacation requests
   const handleViewRequests = async () => {
-    // Add logic for viewing all requests here
-    if (showRequests) { //In case that requests are shown:
+    if (showRequests) {
       setShowRequests(false);
-      } else {
-        try {
-          const response = await fetch(
-            `http://127.0.0.1:8000/api/manager/pending_vacations`,
-          );
-          const data = await response.json();
-          if (response.ok) {
-            setVacationRequests(data);
-            setShowRequests(true);
-          } else {
-            alert("Failed to submit vacation request: " + data.detail);
-          }
-        } catch (error) {
-          console.error("Error showing pending requests:", error);
-          alert("An error occurred while askink for pending requests.");
+    } else { // showRequests is false, so fetch and show
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/manager/pending_vacations`);
+        const data = await response.json();
+        if (response.ok) {
+          setVacationRequests(data);
+          setShowRequests(true);
+        
+        } else {
+          alert("Failed to fetch pending requests: " + data.detail );
         }
+      } catch (error) {
+        console.error("Error fetching pending requests:", error);
+        alert("An error occurred while fetching pending requests.");
       }
-    };
-
-  const handleViewCalendar = () => {
-    alert("Viewing vacation calendar");
-    // Add logic for displaying vacation calendar here
+    }
   };
 
+  const handleFetchCalendar = async () => {
+    if (!startDate || !endDate) {
+      alert("Please select both start and end dates.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/manager/calendar?start_date=${startDate}&end_date=${endDate}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setCalendarData(data); // update state with fetched calendar data
+      } else {
+        alert("Failed to fetch calendar data: " + data.detail);
+      }
+    } catch (error) {
+      console.error("Error fetching calendar data:", error);
+      alert("An error occurred while fetching calendar data.");
+    }
+  };
+
+  // Main render
   return (
-    <Paper sx={{ padding: 4, backgroundColor: '#f9f9f9', borderRadius: 2 }}>
-      <Box sx={{ textAlign: 'center', marginBottom: 3 }}>
+    <Paper sx={{ padding: 4, backgroundColor: "#f9f9f9", borderRadius: 2 }}>
+      <Box sx={{ textAlign: "center", marginBottom: 3 }}>
         <Typography variant="h4" color="primary" gutterBottom>
           Welcome, {userEmail}
         </Typography>
@@ -68,65 +105,93 @@ const ManagerDashboard: React.FC = () => {
         </Typography>
       </Box>
 
-      {/* Action buttons */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
-        {/* Approve and deny request buttons */}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleApproveRequest}
-          sx={{ width: '80%', padding: '10px', marginBottom: 2 }}
-        >
-          ✅ Approve Requests
+
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center" }}>
+
+        {/* View Requests Button */}
+        <Button variant="contained" color="secondary" onClick={handleViewRequests} sx={{ width: "80%", padding: "10px" }}>
+          {showRequests ? "Hide Pending Requests" : "Show Pending Requests"}
         </Button>
 
-        <Button
-          variant="contained"
-          color="error"
-          onClick={handleDenyRequest}
-          sx={{ width: '80%', padding: '10px', marginBottom: 2 }}
-        >
-          ❌ Deny Requests
-        </Button>
-
-        {/* Button to View pending requests*/}
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleViewRequests}
-          sx={{ width: '80%', padding: '10px', marginBottom: 2 }}
-        >
-          {showRequests ? "Hide Pending Requests" : "Show Pending Requests"} 
-        </Button>
         {showRequests && vacationRequests.length > 0 && (
           <Table sx={{ marginTop: 2, width: "100%" }}>
             <TableHead>
               <TableRow>
+                <TableCell>Request ID</TableCell>
                 <TableCell>Start Date</TableCell>
                 <TableCell>End Date</TableCell>
                 <TableCell>Status</TableCell>
+                <TableCell>Approve Request ✅</TableCell>
+                <TableCell>Deny Request❌</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
+              {/*For each pending request, we will add an accept or deny button */}
               {vacationRequests.map((req) => (
                 <TableRow key={req.id}>
+                  <TableCell>{req.id}</TableCell>
                   <TableCell>{req.start_date}</TableCell>
                   <TableCell>{req.end_date}</TableCell>
                   <TableCell>{req.status}</TableCell>
+                  <TableCell>
+                  <Box sx={{ display: "inline", flexDirection: "column", alignItems: "center" }}/>
+                  <Button variant="contained" color="primary" onClick={() =>handleApproveRequest(req.id, "approved")} sx={{ width: "50%", padding: "10px" }}>
+                    ✅
+                  </Button>
+                  </TableCell>
+                  <TableCell>
+                  <Box sx={{ display: "inline", flexDirection: "column", alignItems: "center" }}/>
+                  <Button variant="contained" color="primary" onClick={() =>handleApproveRequest(req.id, "denied")} sx={{ width: "50%", padding: "10px" }}>
+                    ❌
+                  </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         )}
-        {/* View vacation calendar button */}
-        <Button
-          variant="contained"
-          color="warning"
-          onClick={handleViewCalendar}
-          sx={{ width: '80%', padding: '10px' }}
-        >
-          📅 View Vacation Calendar
-        </Button>
+
+        {/* dates chooose - Fetch Calendar */}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: "80%", marginTop: 2 }}>
+          <TextField
+            label="Start Date (YYYY-MM-DD)"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <TextField
+            label="End Date (YYYY-MM-DD)"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+          <Button variant="contained" color="warning" onClick={handleFetchCalendar}>
+            📅 Show Vacations Calendar
+          </Button>
+        </Box>
+
+        {calendarData.length > 0 && (
+          <Table sx={{ marginTop: 2, width: "100%" }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Worker Email</TableCell>
+                <TableCell>Start Date</TableCell>
+                <TableCell>End Date</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {calendarData.map((entry, index) => (
+                <TableRow key={index}>
+                  <TableCell>{entry.user_name}</TableCell>
+                  <TableCell>{entry.start_date}</TableCell>
+                  <TableCell>{entry.end_date}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </Box>
     </Paper>
   );
