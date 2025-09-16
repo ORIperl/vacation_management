@@ -1,43 +1,76 @@
-import React from "react";
-import { Button, Typography, Box, Paper } from "@mui/material";
+import React, { useState } from "react";
+import { Button, Typography, Box, Paper, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 
 // Manager dashboard component
 const ManagerDashboard: React.FC = () => {
-  // פונקציות שמטפלות בהגשת בקשה ובצפייה בבקשות
+ // const user_id = localStorage.getItem("user_id");
+  const userEmail = localStorage.getItem("userEmail") || "Manager"; // Fallback to "manager" if email not found
+  
+  interface VacationRequest {
+      id: number;
+      start_date: string;
+      end_date: string;
+      status: string;
+    }
+    // State to hold fetched vacation requests
+    const [vacationRequests, setVacationRequests] = useState<VacationRequest[]>([]); // use state to hold the pending requests
+  // State to toggle display of requests
+    const [showRequests, setShowRequests] = useState(false); // use state to toggle display
+
+
+  // Functions to handle request submission and viewing
   const handleApproveRequest = () => {
     alert("Vacation request approved!");
-    // כאן תוכל להוסיף את הלוגיקה לאישור הבקשה
+    // Add logic for request approval here
   };
 
   const handleDenyRequest = () => {
     alert("Vacation request denied!");
-    // כאן תוכל להוסיף את הלוגיקה לדחיית הבקשה
+    // Add logic for request denial here
   };
 
-  const handleViewRequests = () => {
-    alert("Viewing all vacation requests");
-    // כאן תוכל להוסיף לוגיקה להצגת כל הבקשות
-  };
+  const handleViewRequests = async () => {
+    // Add logic for viewing all requests here
+    if (showRequests) { //In case that requests are shown:
+      setShowRequests(false);
+      } else {
+        try {
+          const response = await fetch(
+            `http://127.0.0.1:8000/api/manager/pending_vacations`,
+          );
+          const data = await response.json();
+          if (response.ok) {
+            setVacationRequests(data);
+            setShowRequests(true);
+          } else {
+            alert("Failed to submit vacation request: " + data.detail);
+          }
+        } catch (error) {
+          console.error("Error showing pending requests:", error);
+          alert("An error occurred while askink for pending requests.");
+        }
+      }
+    };
 
   const handleViewCalendar = () => {
     alert("Viewing vacation calendar");
-    // כאן תוכל להוסיף לוגיקה להצגת לוח החופשות
+    // Add logic for displaying vacation calendar here
   };
 
   return (
     <Paper sx={{ padding: 4, backgroundColor: '#f9f9f9', borderRadius: 2 }}>
       <Box sx={{ textAlign: 'center', marginBottom: 3 }}>
         <Typography variant="h4" color="primary" gutterBottom>
-          Welcome, Manager
+          Welcome, {userEmail}
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Review and manage vacation requests from workers.
         </Typography>
       </Box>
 
-      {/* כפתורים לפעולות */}
+      {/* Action buttons */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
-        {/* כפתור לאישור ודחיית בקשות */}
+        {/* Approve and deny request buttons */}
         <Button
           variant="contained"
           color="primary"
@@ -56,17 +89,36 @@ const ManagerDashboard: React.FC = () => {
           ❌ Deny Requests
         </Button>
 
-        {/* כפתור לצפייה בבקשות */}
+        {/* Button to View pending requests*/}
         <Button
           variant="contained"
           color="secondary"
           onClick={handleViewRequests}
           sx={{ width: '80%', padding: '10px', marginBottom: 2 }}
         >
-          📋 View All Requests
+          {showRequests ? "Hide Pending Requests" : "Show Pending Requests"} 
         </Button>
-
-        {/* כפתור לצפייה בלוח חופשות */}
+        {showRequests && vacationRequests.length > 0 && (
+          <Table sx={{ marginTop: 2, width: "100%" }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Start Date</TableCell>
+                <TableCell>End Date</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {vacationRequests.map((req) => (
+                <TableRow key={req.id}>
+                  <TableCell>{req.start_date}</TableCell>
+                  <TableCell>{req.end_date}</TableCell>
+                  <TableCell>{req.status}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+        {/* View vacation calendar button */}
         <Button
           variant="contained"
           color="warning"
