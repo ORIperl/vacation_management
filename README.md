@@ -84,7 +84,7 @@ npm install
 npm start
 ```
 
-Frontend should be available at `http://localhost:5173`.
+Frontend should be available at `http://localhost:5173/login`.
 
 ---
 
