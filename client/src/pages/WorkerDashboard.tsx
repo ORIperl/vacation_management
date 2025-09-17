@@ -98,85 +98,119 @@ const WorkerDashboard: React.FC = () => {
     }
   };
 
-  return (
-    <Paper sx={{ padding: 4, backgroundColor: "#f9f9f9", borderRadius: 2 }}>
-      <Box sx={{ textAlign: "center", marginBottom: 3 }}>
-        <Typography variant="h4" color="primary" gutterBottom>
-          Welcome, {userEmail}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Manage your vacation requests and view your history.
-        </Typography>
-      </Box>
+return (
+  <Paper sx={{ padding: 4, backgroundColor: "#f9f9f9", borderRadius: 2 }}>
+    <Box
+      sx={{
+        display: "flex",          // turns into two columns
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+      }}
+    >
+      {/* left side - fro*/}
+      <Box sx={{ flex: 1, marginRight: 2 }}>
+        <Box sx={{ textAlign: "center", marginBottom: 3 }}>
+          <Typography variant="h4" color="primary" gutterBottom>
+            Welcome, {userEmail}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Manage your vacation requests and view your history.
+          </Typography>
+        </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          alignItems: "center",
-        }}
-      >
-        {/* Vacation form */}
-        <TextField
-          label="Start Date (YYYY-MM-DD)"
-          type="date"
-          InputLabelProps={{ shrink: true }}
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          sx={{ width: "80%" }}
-        />
-        <TextField
-          label="End Date (YYYY-MM-DD)"
-          type="date"
-          InputLabelProps={{ shrink: true }}
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          sx={{ width: "80%" }}
-        />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            alignItems: "center",
+          }}
+        >
+          {/* Vacation form */}
+          <TextField
+            label="Start Date (YYYY-MM-DD)"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            sx={{ width: "80%" }}
+          />
+          <TextField
+            label="End Date (YYYY-MM-DD)"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            sx={{ width: "80%" }}
+          />
 
-        <Button
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmitVacationRequest}
+            sx={{ width: "80%", padding: "10px" }}
+          >
+            Submit Vacation Request
+          </Button>
+
+          {/*Button to show requests */}
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={toggleWorkerVacationRequests}
+            sx={{ width: "80%", padding: "10px" }}
+          >
+            {showRequests ? "Hide My Requests" : "Show My Requests"}
+          </Button>
+
+          {showRequests && vacationRequests.length > 0 && (
+            <Table sx={{ marginTop: 2, width: "100%" }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Start Date</TableCell>
+                  <TableCell>End Date</TableCell>
+                  <TableCell>Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {vacationRequests.map((req) => (
+                  <TableRow key={req.id}>
+                    <TableCell>{req.start_date}</TableCell>
+                    <TableCell>{req.end_date}</TableCell>
+                    <TableCell>{req.status}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        <Box>
+          <Button
           variant="contained"
           color="primary"
-          onClick={handleSubmitVacationRequest}
+          onClick={() => {
+            localStorage.removeItem("userEmail");
+            window.location.href = "/login";
+          }}
           sx={{ width: "80%", padding: "10px" }}
         >
-          Submit Vacation Request
-        </Button>
-
-        {/*Button to show requests */}
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={toggleWorkerVacationRequests}
-          sx={{ width: "80%", padding: "10px" }}
-        >
-          {showRequests ? "Hide My Requests" : "Show My Requests"} 
-        </Button>
-
-        {showRequests && vacationRequests.length > 0 && (
-          <Table sx={{ marginTop: 2, width: "100%" }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Start Date</TableCell>
-                <TableCell>End Date</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {vacationRequests.map((req) => (
-                <TableRow key={req.id}>
-                  <TableCell>{req.start_date}</TableCell>
-                  <TableCell>{req.end_date}</TableCell>
-                  <TableCell>{req.status}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+          logout
+          </Button>
+        </Box>
+        </Box>
       </Box>
-    </Paper>
-  );
+
+      {/* right side - photo*/}
+      <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+        <img
+          src="/worker.png"
+          alt="Vacation illustration"
+          style={{ maxWidth: "80%", borderRadius: "10px" }}
+        />
+      </Box>
+    </Box>
+  </Paper>
+);
+
 };
 
 export default WorkerDashboard;

@@ -63,9 +63,9 @@ const AuthPage = () => {
     }
   };
 
+  // Signup handler
   const handleSignup = async (event: React.FormEvent) => {
     event.preventDefault();
-
     try {
       const response = await fetch("http://127.0.0.1:8000/api/signup", {
         method: "POST",
@@ -81,128 +81,160 @@ const AuthPage = () => {
       } else {
         alert("Signup failed: " + data.detail);
       }
-    } catch (error) {
+    } catch (error) { 
       console.error("Error during signup:", error);
       alert("An error occurred during signup.");
     }
   };
 
-  return (
+return (
     <Box
       sx={{
         display: "flex",
-        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         height: "100vh",
         backgroundColor: "#f4f4f4",
+        padding: 4
       }}
     >
-      <Typography variant="h4" color="primary" sx={{ marginBottom: 2 }}>
-        {tab === 0 ? "Login" : "Sign Up"}
-      </Typography>
+      {/* left side - form*/}
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          backgroundColor: "#fff",
+          borderRadius: 2,
+          padding: 4,
+          marginRight: 2,
+          boxShadow: 2,
+        }}
+      >
+        <Typography variant="h4" color="primary" sx={{ marginBottom: 2 }}>
+          {tab === 0 ? "Login" : "Sign Up"}
+        </Typography>
 
-      <Tabs value={tab} onChange={handleTabChange} centered>
-        <Tab label="Login" />
-        <Tab label="Sign Up" />
-      </Tabs>
+        <Tabs value={tab} onChange={handleTabChange} centered sx={{ marginBottom: 2 }}>
+          <Tab label="Login" />
+          <Tab label="Sign Up" />
+        </Tabs>
 
-      {/* Login Form */}
-      {tab === 0 && (
-        <form onSubmit={handleLogin} style={{ width: "300px" }}>
-          <TextField
-            label="Email"
-            variant="outlined"
-            fullWidth
-            required
-            margin="normal"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+        {/* Login Form */}
+        {tab === 0 && (
+          <form onSubmit={handleLogin} style={{ width: "300px" }}>
+            <TextField
+              label="Email"
+              variant="outlined"
+              fullWidth
+              required
+              margin="normal"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            required
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+            <TextField
+              label="Password"
+              type="password"
+              variant="outlined"
+              fullWidth
+              required
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ marginTop: 2 }}
-          >
-            Login
-          </Button>
-        </form>
-      )}
-
-      {/* Signup Form */}
-      {tab === 1 && (
-        <form onSubmit={handleSignup} style={{ width: "300px" }}>
-          <TextField
-            label="Email"
-            variant="outlined"
-            fullWidth
-            required
-            margin="normal"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            required
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <FormControl component="fieldset" sx={{ marginTop: 2 }}>
-            <FormLabel component="legend">Role</FormLabel>
-            <RadioGroup
-              row
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              aria-label="role"
-              name="role"
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ marginTop: 2 }}
             >
-              <FormControlLabel
-                value="worker"
-                control={<Radio />}
-                label="Worker"
-              />
-              <FormControlLabel
-                value="manager"
-                control={<Radio />}
-                label="Manager"
-              />
-            </RadioGroup>
-          </FormControl>
+              Login
+            </Button>
+          </form>
+        )}
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ marginTop: 2 }}
-          >
-            Sign Up
-          </Button>
-        </form>
-      )}
+        {/* Signup Form */}
+        {tab === 1 && (
+          <form onSubmit={handleSignup} style={{ width: "300px" }}>
+            <TextField
+              label="Email"
+              variant="outlined"
+              fullWidth
+              required
+              margin="normal"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <TextField
+              label="Password"
+              type="password"
+              variant="outlined"
+              fullWidth
+              required
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <FormControl component="fieldset" sx={{ marginTop: 2 }}>
+              <FormLabel component="legend">Role</FormLabel>
+              <RadioGroup
+                row
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                aria-label="role"
+                name="role"
+              >
+                <FormControlLabel
+                  value="worker"
+                  control={<Radio />}
+                  label="Worker"
+                />
+                <FormControlLabel
+                  value="manager"
+                  control={<Radio />}
+                  label="Manager"
+                />
+              </RadioGroup>
+            </FormControl>
+
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ marginTop: 2 }}
+            >
+              Sign Up
+            </Button>
+          </form>
+        )}
+      </Box>
+
+      {/* right side - photo*/}
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          mt: -20
+        }}
+      >
+        <img
+          src="/vacation.png" 
+          alt="Authentication illustration"
+          style={{ maxWidth: "100%", borderRadius: "12px" }}
+        />
+      </Box>
     </Box>
   );
-};
+}
 
 export default function App() {
   return (

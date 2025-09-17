@@ -93,105 +93,166 @@ const ManagerDashboard: React.FC = () => {
     }
   };
 
-  // Main render
   return (
     <Paper sx={{ padding: 4, backgroundColor: "#f9f9f9", borderRadius: 2 }}>
-      <Box sx={{ textAlign: "center", marginBottom: 3 }}>
-        <Typography variant="h4" color="primary" gutterBottom>
-          Welcome, {userEmail}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Review and manage vacation requests from workers.
-        </Typography>
-      </Box>
-
-
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center" }}>
-
-        {/* View Requests Button */}
-        <Button variant="contained" color="secondary" onClick={handleViewRequests} sx={{ width: "80%", padding: "10px" }}>
-          {showRequests ? "Hide Pending Requests" : "Show Pending Requests"}
-        </Button>
-
-        {showRequests && vacationRequests.length > 0 && (
-          <Table sx={{ marginTop: 2, width: "100%" }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Request ID</TableCell>
-                <TableCell>Start Date</TableCell>
-                <TableCell>End Date</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Approve Request ✅</TableCell>
-                <TableCell>Deny Request❌</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {/*For each pending request, we will add an accept or deny button */}
-              {vacationRequests.map((req) => (
-                <TableRow key={req.id}>
-                  <TableCell>{req.id}</TableCell>
-                  <TableCell>{req.start_date}</TableCell>
-                  <TableCell>{req.end_date}</TableCell>
-                  <TableCell>{req.status}</TableCell>
-                  <TableCell>
-                  <Box sx={{ display: "inline", flexDirection: "column", alignItems: "center" }}/>
-                  <Button variant="contained" color="primary" onClick={() =>handleApproveRequest(req.id, "approved")} sx={{ width: "50%", padding: "10px" }}>
-                    ✅
-                  </Button>
-                  </TableCell>
-                  <TableCell>
-                  <Box sx={{ display: "inline", flexDirection: "column", alignItems: "center" }}/>
-                  <Button variant="contained" color="primary" onClick={() =>handleApproveRequest(req.id, "denied")} sx={{ width: "50%", padding: "10px" }}>
-                    ❌
-                  </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-
-        {/* dates chooose - Fetch Calendar */}
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: "80%", marginTop: 2 }}>
-          <TextField
-            label="Start Date (YYYY-MM-DD)"
-            type="date"
-            InputLabelProps={{ shrink: true }}
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <TextField
-            label="End Date (YYYY-MM-DD)"
-            type="date"
-            InputLabelProps={{ shrink: true }}
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-          <Button variant="contained" color="warning" onClick={handleFetchCalendar}>
-            📅 Show Vacations Calendar
-          </Button>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+        }}
+      >
+        {/* צד שמאל - תוכן ניהולי */}
+        <Box sx={{ flex: 1, marginRight: 2 }}>
+          <Box sx={{ textAlign: "center", marginBottom: 3 }}>
+            <Typography variant="h4" color="primary" gutterBottom>
+              Welcome, {userEmail}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Review and manage vacation requests from workers.
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              alignItems: "center",
+            }}
+          >
+            {/* View Requests Button */}
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleViewRequests}
+              sx={{ width: "80%", padding: "10px" }}
+            >
+              {showRequests ? "Hide Pending Requests" : "Show Pending Requests"}
+            </Button>
+            {showRequests && vacationRequests.length > 0 && (
+              <Table sx={{ marginTop: 2, width: "100%" }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Request ID</TableCell>
+                    <TableCell>Start Date</TableCell>
+                    <TableCell>End Date</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Approve ✅</TableCell>
+                    <TableCell>Deny ❌</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {vacationRequests.map((req) => (
+                    <TableRow key={req.id}>
+                      <TableCell>{req.id}</TableCell>
+                      <TableCell>{req.start_date}</TableCell>
+                      <TableCell>{req.end_date}</TableCell>
+                      <TableCell>{req.status}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() =>
+                            handleApproveRequest(req.id, "approved")
+                          }
+                          sx={{ width: "50%", padding: "10px" }}
+                        >
+                          ✅
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() =>
+                            handleApproveRequest(req.id, "denied")
+                          }
+                          sx={{ width: "50%", padding: "10px" }}
+                        >
+                          ❌
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+            {/* Dates choose - Fetch Calendar */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                width: "80%",
+                marginTop: 2,
+              }}
+            >
+              <TextField
+                label="Start Date (YYYY-MM-DD)"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              <TextField
+                label="End Date (YYYY-MM-DD)"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={handleFetchCalendar}
+              >
+                📅 Show Vacations Calendar
+              </Button>
+            </Box>
+            {calendarData.length > 0 && (
+              <Table sx={{ marginTop: 2, width: "100%" }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Worker Email</TableCell>
+                    <TableCell>Start Date</TableCell>
+                    <TableCell>End Date</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {calendarData.map((entry, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{entry.user_name}</TableCell>
+                      <TableCell>{entry.start_date}</TableCell>
+                      <TableCell>{entry.end_date}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          <Box>
+            <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              localStorage.removeItem("userEmail");
+              window.location.href = "/login";
+            }}
+            sx={{ width: "80%", padding: "10px" }}
+          >
+            logout
+            </Button>
+          </Box>
+          </Box>
         </Box>
 
-        {calendarData.length > 0 && (
-          <Table sx={{ marginTop: 2, width: "100%" }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Worker Email</TableCell>
-                <TableCell>Start Date</TableCell>
-                <TableCell>End Date</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {calendarData.map((entry, index) => (
-                <TableRow key={index}>
-                  <TableCell>{entry.user_name}</TableCell>
-                  <TableCell>{entry.start_date}</TableCell>
-                  <TableCell>{entry.end_date}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+        {/* right side - photo */}
+        <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+          <img
+            src="/boss.png" 
+            alt="Manager illustration"
+            style={{ maxWidth: "100%", borderRadius: "8px" }}
+          />
+        </Box>
       </Box>
     </Paper>
   );
